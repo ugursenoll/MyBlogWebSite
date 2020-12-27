@@ -12,6 +12,8 @@ using MyBlogWebSite.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MyBlogWebSite.Services;
+using MyBlogWebSite.Repository;
 
 namespace MyBlogWebSite
 {
@@ -27,13 +29,18 @@ namespace MyBlogWebSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
+            services.AddMvc().AddMvcOptions(opt => opt.EnableEndpointRouting = false);
+
+            services.AddTransient<IBlogService, BlogService>();
+            services.AddTransient<IBlogRepository, BlogRepository>();
+            services.AddDbContext<MyBlogDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddScoped<DbContext, MyBlogDbContext>();
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<MyBlogDbContext>();
             services.AddControllersWithViews();
-            services.AddRazorPages();
+            //services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

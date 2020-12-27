@@ -6,22 +6,31 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MyBlogWebSite.Models;
+using MyBlogWebSite.Services;
 
 namespace MyBlogWebSite.Controllers
 {
     public class BlogController : Controller
     {
-        private readonly ILogger<BlogController> _logger;
+        private readonly IBlogService blogService;
 
-        public BlogController(ILogger<BlogController> logger)
+        public BlogController(IBlogService blogService)
         {
-            _logger = logger;
+            this.blogService = blogService;
         }
-
+        
         public IActionResult Index()
         {
-            return View();
+            BlogViewModel blogViewModel = new BlogViewModel();
+            blogViewModel.Blogs = blogService.GetBlogs().ToList();
+            blogViewModel.ImagePath = ImageFilePath();
+            return View(blogViewModel);
         }
 
+        public string ImageFilePath()
+        {
+            return "/img/uploads/blogs";
+        }
     }
+
 }
